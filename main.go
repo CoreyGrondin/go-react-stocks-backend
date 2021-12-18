@@ -22,13 +22,15 @@ func main() {
 	//Handling the /v1/teachers. The handler is a function here
 	mux.HandleFunc("/", Serve)
 
-	//Create the server. 
+	//Create the server.
 	s := &http.Server{
 		Addr:    ":8080",
 		Handler: mux,
 	}
-	s.ListenAndServe()
-
+	err := s.ListenAndServe()
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 type cat struct {
@@ -51,8 +53,9 @@ func index(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	json.NewEncoder(w).Encode(cat1)
-
+	if err := json.NewEncoder(w).Encode(cat1); err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func indexPost(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +73,9 @@ func indexPost(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		log.Fatalln(err)
+	}
 
 }
 
@@ -78,13 +83,20 @@ func indexPost(w http.ResponseWriter, r *http.Request) {
 func teacherHandler(res http.ResponseWriter, req *http.Request) {
 	data := []byte("V1 of teacher's called")
 	res.WriteHeader(200)
-	res.Write(data)
+	_, err := res.Write(data)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 }
 
 func home(res http.ResponseWriter, req *http.Request) {
 	data := []byte("home page :)")
 	res.WriteHeader(200)
-	res.Write(data)
+	_, err := res.Write(data)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 var routes = []route{
@@ -166,26 +178,28 @@ func dbinsert(w http.ResponseWriter, r *http.Request) {
 	var filename = "./config/config.development.json"
 
 	//filename is the path to the json config file
-	file, err := os.Open(filename) 
-	if err != nil {  
+	file, err := os.Open(filename)
+	if err != nil {
 		panic(err)
-	}  
-	decoder := json.NewDecoder(file) 
-	err = decoder.Decode(&config) 
+	}
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(&config)
 	if err != nil {  panic(err)}
 
 
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", config.Host, config.Port, config.User, config.Password, config.Dbname)
- 
+
     db, _ := sql.Open("postgres", psqlconn)
- 
+
     defer db.Close()
-  
+
     // dynamic
     insertDynStmt := `insert into "catfacts"("fact", "length") values($1, $2)`
     _, _ = db.Exec(insertDynStmt, cat1.Fact, cat1.Length)
 
-	json.NewEncoder(w).Encode(cat1)
+	if err := json.NewEncoder(w).Encode(cat1); err != nil {
+		log.Fatalln(err)
+	}
 
 }
 
@@ -209,21 +223,21 @@ func dbget(w http.ResponseWriter, r *http.Request) {
 	var filename = "./config/config.development.json"
 
 	//filename is the path to the json config file
-	file, err := os.Open(filename) 
-	if err != nil {  
+	file, err := os.Open(filename)
+	if err != nil {
 		panic(err)
-	}  
-	decoder := json.NewDecoder(file) 
-	err = decoder.Decode(&config) 
+	}
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(&config)
 	if err != nil {  panic(err)}
 
 
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", config.Host, config.Port, config.User, config.Password, config.Dbname)
- 
+
     db, _ := sql.Open("postgres", psqlconn)
- 
+
     defer db.Close()
-  
+
     // dynamic
 	rows, _ := db.Query(`SELECT "fact", "length" FROM "catfacts"`)
 
@@ -233,14 +247,16 @@ func dbget(w http.ResponseWriter, r *http.Request) {
     for rows.Next() {
 		var fact string
 		var length int
-	 
+
 		err = rows.Scan(&fact, &length)
 		CheckError(err)
-	 
+
 		fmt.Println(fact, length)
 	}
 
-	json.NewEncoder(w).Encode(cat1)
+	if err := json.NewEncoder(w).Encode(cat1); err != nil {
+		log.Fatalln(err)
+	}
 
 }
 
