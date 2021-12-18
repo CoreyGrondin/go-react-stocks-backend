@@ -149,12 +149,12 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 	http.NotFound(w, r)
 }
 
-type Configuration struct {
-    Host              string
-    Port   int
+type configuration struct {
+    Host string
+    Port int
     User string
 	Password string
-    Dbname  string
+    Dbname string
 }
 
 
@@ -173,7 +173,7 @@ func dbinsert(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	var config Configuration
+	var config configuration
 
 	var filename = "./config/config.development.json"
 
@@ -218,7 +218,7 @@ func dbget(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	var config Configuration
+	var config configuration
 
 	var filename = "./config/config.development.json"
 
