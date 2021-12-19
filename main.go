@@ -79,7 +79,6 @@ func indexPost(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
 func teacherHandler(res http.ResponseWriter, req *http.Request) {
 	data := []byte("V1 of teacher's called")
 	res.WriteHeader(200)
@@ -101,8 +100,8 @@ func home(res http.ResponseWriter, req *http.Request) {
 
 var routes = []route{
 	newRoute("GET", "/", home),
-	newRoute("GET", "/contact", /*contact*/ index),
-	newRoute("GET", "/api/widgets", /*apiGetWidgets*/ teacherHandler),
+	newRoute("GET", "/contact" /*contact*/, index),
+	newRoute("GET", "/api/widgets" /*apiGetWidgets*/, teacherHandler),
 	newRoute("POST", "/api/widgets", indexPost),
 	newRoute("POST", "/api/insert", dbinsert),
 	newRoute("GET", "/api/insert", dbget),
@@ -150,13 +149,12 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 }
 
 type configuration struct {
-    Host string
-    Port int
-    User string
+	Host     string
+	Port     int
+	User     string
 	Password string
-    Dbname string
+	Dbname   string
 }
-
 
 func dbinsert(w http.ResponseWriter, r *http.Request) {
 
@@ -184,18 +182,19 @@ func dbinsert(w http.ResponseWriter, r *http.Request) {
 	}
 	decoder := json.NewDecoder(file)
 	err = decoder.Decode(&config)
-	if err != nil {  panic(err)}
-
+	if err != nil {
+		panic(err)
+	}
 
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", config.Host, config.Port, config.User, config.Password, config.Dbname)
 
-    db, _ := sql.Open("postgres", psqlconn)
+	db, _ := sql.Open("postgres", psqlconn)
 
-    defer db.Close()
+	defer db.Close()
 
-    // dynamic
-    insertDynStmt := `insert into "catfacts"("fact", "length") values($1, $2)`
-    _, _ = db.Exec(insertDynStmt, cat1.Fact, cat1.Length)
+	// dynamic
+	insertDynStmt := `insert into "catfacts"("fact", "length") values($1, $2)`
+	_, _ = db.Exec(insertDynStmt, cat1.Fact, cat1.Length)
 
 	if err := json.NewEncoder(w).Encode(cat1); err != nil {
 		log.Fatalln(err)
@@ -229,22 +228,23 @@ func dbget(w http.ResponseWriter, r *http.Request) {
 	}
 	decoder := json.NewDecoder(file)
 	err = decoder.Decode(&config)
-	if err != nil {  panic(err)}
-
+	if err != nil {
+		panic(err)
+	}
 
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", config.Host, config.Port, config.User, config.Password, config.Dbname)
 
-    db, _ := sql.Open("postgres", psqlconn)
+	db, _ := sql.Open("postgres", psqlconn)
 
-    defer db.Close()
+	defer db.Close()
 
-    // dynamic
+	// dynamic
 	rows, _ := db.Query(`SELECT "fact", "length" FROM "catfacts"`)
 
 	//fmt.Println(rows)
 
 	defer rows.Close()
-    for rows.Next() {
+	for rows.Next() {
 		var fact string
 		var length int
 
@@ -261,7 +261,7 @@ func dbget(w http.ResponseWriter, r *http.Request) {
 }
 
 func CheckError(err error) {
-    if err != nil {
-        panic(err)
-    }
+	if err != nil {
+		panic(err)
+	}
 }
