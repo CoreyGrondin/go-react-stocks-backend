@@ -10,3 +10,4 @@ repos:
       rev: v1.43.0
       hooks:
           - id: golangci-lint
+            args: [--enable, gofmt]
