@@ -67,13 +67,7 @@ func indexPost(w http.ResponseWriter, r *http.Request) {
 
 	defer resp.Body.Close()
 
-	var cat1 cat
-
-	if err := json.NewDecoder(resp.Body).Decode(&cat1); err != nil {
-		log.Fatalln(err)
-	}
-
-	if err := json.NewEncoder(w).Encode(resp); err != nil {
+	if err := json.NewEncoder(w).Encode(resp.Body); err != nil {
 		log.Fatalln(err)
 	}
 
