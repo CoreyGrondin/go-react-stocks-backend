@@ -11,8 +11,7 @@ import (
 	// "os"
 	"regexp"
 	"strings"
-
-	_ "github.com/lib/pq"
+	// _ "github.com/lib/pq"
 )
 
 func main() {
